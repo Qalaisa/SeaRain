@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeaRain | 汐雨的世界</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&family=Orbitron:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        aether: {
+                            900: '#030712', // Deepest Blue
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            main: '#3b82f6',
+                            accent: '#06b6d4', // Cyan
+                            glow: '#60a5fa',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                        mono: ['"Orbitron"', 'monospace'], // Tech feel
+                        cute: ['"Zen Maru Gothic"', 'sans-serif'], // Anime feel
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 1s linear infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'spin-slower': 'spin 20s linear infinite',
+                        'spin-reverse-fast': 'spin 2s linear infinite reverse',
+                    },
+                    transitionTimingFunction: {
+                        'expo-out': 'cubic-bezier(0.19, 1, 0.22, 1)', // Super snappy mechanical feel
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glitch: {
+                            '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
+                            '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
+                            '62%': { transform: 'translate(0,0) skew(5deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles for Scrollbar & Noise */
+        body {
+            background-color: #030712;
+            color: #e2e8f0;
+            overflow-x: hidden; /* Initially hidden for loading */
+        }
+
+        /* Enable scroll after load */
+        body.loaded {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Noise Overlay */
+        .noise-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #06b6d4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+
+        /* Glassmorphism Utility */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .glass-card:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px -10px rgba(6, 182, 212, 0.3);
+        }
+
+        /* View Switching */
+        .view-section {
+            display: none; /* Default hidden */
+            opacity: 0;
+            pointer-events: none; /* Prevent clicking when hidden */
+            transition: opacity 0.4s ease-out;
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto; /* Enable clicking when active */
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Main Content Entrance Animation */
+        #main-app {
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 1s ease-out, transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        #main-app.app-loaded {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ================= THREE BODY ANIMATION STYLES ================= */
+        .three-body-container {
+            position: relative;
+            width: 550px;  /* 400px -> 550px */
+            height: 550px; /* 400px -> 550px */
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        /* The orbits are slightly tilted rings */
+        .orbit-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-style: preserve-3d;
+            border-radius: 50%;
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.05);
+        }
+
+        /* Body 1: Large, slow, horizontal-ish */
+        .ring-1 {
+            width: 450px; height: 450px; /* 320px -> 450px */
+            margin-left: -225px; margin-top: -225px; /* Adjusted centers */
+            animation: orbit-wobble-1 20s ease-in-out infinite alternate;
+        }
+        .rotator-1 {
+            width: 100%; height: 100%;
+            animation: spin 12s linear infinite;
+        }
+        .planet-1 {
+            position: absolute; top: 50%; right: -6px;
+            width: 12px; height: 12px; border-radius: 50%;
+            margin-top: -6px;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.8);
+        }
+
+        /* Body 2: Vertical, faster */
+        .ring-2 {
+            width: 380px; height: 380px; /* 280px -> 380px */
+            margin-left: -190px; margin-top: -190px; /* Adjusted centers */
+            animation: orbit-wobble-2 25s ease-in-out infinite alternate-reverse;
+        }
+        .rotator-2 {
+            width: 100%; height: 100%;
+            animation: spin 8s linear infinite reverse;
+        }
+        .planet-2 {
+            position: absolute; top: -5px; left: 50%;
+            width: 10px; height: 10px; border-radius: 50%;
+            margin-left: -5px;
+            background: #06b6d4;
+            box-shadow: 0 0 15px rgba(6,182,212,0.8);
+        }
+
+        /* Body 3: Small, erratic, diagonal */
+        .ring-3 {
+            width: 520px; height: 520px; /* 380px -> 520px */
+            margin-left: -260px; margin-top: -260px; /* Adjusted centers */
+            border-color: rgba(59, 130, 246, 0.1);
+            animation: orbit-wobble-3 30s ease-in-out infinite alternate;
+        }
+        .rotator-3 {
+            width: 100%; height: 100%;
+            animation: spin 15s linear infinite;
+        }
+        .planet-3 {
+            position: absolute; bottom: 15%; left: 15%;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.8);
+        }
+
+        /* Keyframes for 3D Orbit Tilting (Simulating Chaos) */
+        @keyframes orbit-wobble-1 {
+            0% { transform: rotateX(70deg) rotateY(-10deg); }
+            100% { transform: rotateX(60deg) rotateY(10deg); }
+        }
+        @keyframes orbit-wobble-2 {
+            0% { transform: rotateX(10deg) rotateY(60deg); }
+            100% { transform: rotateX(-10deg) rotateY(80deg); }
+        }
+        @keyframes orbit-wobble-3 {
+            0% { transform: rotateX(45deg) rotateY(45deg); }
+            100% { transform: rotateX(30deg) rotateY(60deg); }
+        }
+
+        /* Additional clip-path utility for slanted buttons */
+        .clip-path-slant {
+            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 25%);
+        }
+        .animate-reverse-spin {
+            animation: spin 15s linear infinite reverse;
+        }
+    </style>
+</head>
+<body class="relative font-sans antialiased overflow-hidden">
+
+    <!-- ================= LOADING SCREEN ================= -->
+    <div id="loader" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto">
+        
+        <!-- Split Shutters (The Background) -->
+        <div id="loader-top" class="absolute top-0 left-0 w-full h-1/2 bg-[#020617] border-b border-aether-accent/20 transition-transform duration-[1500ms] ease-expo-out origin-top z-0">
+             <div class="absolute bottom-0 right-0 p-4 opacity-30">
+                 <div class="flex gap-2">
+                     <div class="w-2 h-2 bg-aether-accent rounded-full animate-pulse"></div>
+                     <div class="w-2 h-2 bg-aether-accent rounded-full animate-pulse delay-75"></div>
+                     <div class="w-2 h-2 bg-aether-accent rounded-full animate-pulse delay-150"></div>
+                 </div>
+             </div>
+        </div>
+        
+        <div id="loader-bottom" class="absolute bottom-0 left-0 w-full h-1/2 bg-[#020617] border-t border-aether-accent/20 transition-transform duration-[1500ms] ease-expo-out origin-bottom z-0">
+             <div class="absolute top-0 left-0 p-4 opacity-30 font-mono text-[10px] text-aether-accent">
+                 PROJECT_ETHER.SYS // V2.0 <br>
+                 SEQUENTIAL_LOAD_INIT
+             </div>
+        </div>
+
+        <!-- Loader Content (Center) -->
+        <div id="loader-content" class="relative z-10 flex flex-col items-center w-full max-w-[300px] transition-all duration-500">
+            <div class="mb-12 relative h-24 w-24 flex items-center justify-center">
+                <div class="absolute inset-0 border-2 border-aether-accent/30 rotate-45 animate-spin-slow"></div>
+                <div class="absolute inset-2 border border-aether-accent/50 rotate-[25deg] animate-spin-reverse-fast border-dashed"></div>
+                <div class="w-10 h-10 bg-aether-accent/10 backdrop-blur border border-aether-accent rotate-45 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                     <div class="w-4 h-4 bg-aether-accent rotate-45"></div>
+                </div>
+            </div>
+
+            <div class="w-full font-mono text-aether-accent space-y-2">
+                <div class="flex justify-between text-xs font-bold tracking-wider">
+                    <span id="loader-status" class="animate-pulse">INITIALIZING...</span>
+                    <span id="loader-percent">00%</span>
+                </div>
+                <div class="w-full h-[2px] bg-aether-900/50 relative overflow-hidden">
+                    <div id="loader-bar" class="absolute top-0 left-0 h-full bg-aether-accent shadow-[0_0_10px_#06b6d4] w-0 transition-all duration-100 ease-out"></div>
+                </div>
+                <div class="h-6 overflow-hidden relative mt-2 opacity-50">
+                    <div id="loader-code" class="text-[10px] leading-tight text-gray-500 font-mono whitespace-nowrap">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SOCIAL POPUP MODAL ================= -->
+    <div id="social-modal" class="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none opacity-0 transition-all duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeSocialModal()"></div>
+        
+        <!-- Modal Card -->
+        <div class="relative z-10 bg-aether-900/90 border border-aether-accent/30 p-8 rounded-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center shadow-[0_0_40px_rgba(6,182,212,0.2)]" id="social-modal-card">
+            
+            <!-- Close Button -->
+            <button onclick="closeSocialModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                <i data-lucide="x"></i>
+            </button>
+
+            <!-- Icon Display -->
+            <div id="social-icon-container" class="w-20 h-20 rounded-full bg-aether-accent/10 flex items-center justify-center text-aether-accent mb-6 border border-aether-accent/20 shadow-[0_0_15px_rgba(6,182,212,0.15)] animate-pulse-slow">
+                <!-- Icon will be injected here -->
+            </div>
+
+            <!-- Text Content -->
+            <h3 id="social-title" class="text-xl font-bold text-white mb-2 font-mono tracking-wider">TITLE</h3>
+            <div class="w-full bg-black/40 border border-white/5 rounded p-3 mb-6 overflow-hidden">
+                <p id="social-value" class="text-gray-400 font-mono text-xs break-all">VALUE</p>
+            </div>
+
+            <!-- Action Button -->
+            <button id="social-action-btn" class="w-full py-3 bg-aether-accent text-black font-bold font-mono tracking-widest hover:bg-white transition-all duration-300 clip-path-slant">
+                ACTION
+            </button>
+        </div>
+    </div>
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-bg"></div>
+
+    <!-- Decorative Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-aether-main/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-aether-accent/10 rounded-full blur-[100px]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+    </div>
+
+    <!-- WRAPPER FOR MAIN APP TO ANIMATE IN -->
+    <div id="main-app">
+        
+        <!-- Navigation -->
+        <nav class="fixed top-0 w-full z-40 glass-panel border-b-0 border-b-aether-accent/20 h-16 transition-all duration-300" id="navbar">
+            <div class="container mx-auto px-6 h-full flex justify-between items-center">
+                <div onclick="switchView('home-view')" class="text-2xl font-mono font-bold text-white flex items-center gap-2 cursor-pointer group">
+                    <i data-lucide="hexagon" class="text-aether-accent group-hover:animate-spin-slow"></i>
+                    <span class="tracking-widest group-hover:text-aether-accent transition-colors">SeaRain</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 font-mono text-sm tracking-wider">
+                    <a href="#" onclick="switchView('home-view'); return false;" class="hover:text-aether-accent transition-colors relative group">
+                        01. <span class="group-hover:ml-1 transition-all">HOME</span>
+                        <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-aether-accent group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="#dynamic" onclick="switchView('home-view'); setTimeout(() => document.getElementById('dynamic').scrollIntoView({behavior: 'smooth'}), 100); return false;" class="hover:text-aether-accent transition-colors relative group">
+                        02. <span class="group-hover:ml-1 transition-all">LOGS</span>
+                        <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-aether-accent group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="#" onclick="openArchive('novel'); return false;" class="hover:text-aether-accent transition-colors relative group">
+                        03. <span class="group-hover:ml-1 transition-all">NOVELS</span>
+                        <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-aether-accent group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="#" onclick="openArchive('art'); return false;" class="hover:text-aether-accent transition-colors relative group">
+                        04. <span class="group-hover:ml-1 transition-all">ARTWORKS</span>
+                        <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-aether-accent group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white hover:text-aether-accent">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <main class="min-h-screen">
+
+            <!-- VIEW 1: HOME VIEW (Main Page) -->
+            <div id="home-view" class="view-section active">
+                
+                <!-- HERO SECTION -->
+                <section id="home" class="min-h-screen flex items-center relative pt-16">
+                    <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                        <div class="z-10 relative">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-aether-accent/10 border border-aether-accent/30 text-aether-accent text-xs font-mono mb-6">
+                                <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-aether-accent opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-aether-accent"></span>
+                                </span>
+                                DREAM ONLINE // 欢迎访问
+                            </div>
+
+                            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight font-sans">
+                                <span class="block text-white drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]">创造</span>
+                                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-aether-accent to-aether-main animate-pulse-slow">这片梦境的</span>
+                                <span class="block text-white relative inline-block">
+                                    汐雨酱
+                                    <svg class="absolute w-full h-3 bottom-1 left-0 text-aether-accent -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                        <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="3" fill="none" />
+                                    </svg>
+                                </span>
+                            </h1>
+
+                            <div class="h-20 mb-8">
+                                <p id="typing-text" class="text-lg md:text-xl text-gray-400 font-light max-w-lg leading-relaxed font-mono border-l-2 border-aether-accent pl-4"></p>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button onclick="openArchive('art')" class="px-8 py-3 bg-aether-accent text-black font-bold hover:bg-white transition-colors duration-300 clip-path-slant flex items-center gap-2">
+                                    <span>查看作品</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="document.getElementById('dynamic').scrollIntoView({behavior: 'smooth'})" class="px-8 py-3 border border-aether-accent/50 text-aether-accent hover:bg-aether-accent/10 transition-colors duration-300 clip-path-slant">
+                                    最新动态
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3D Three Body Animation System -->
+                        <div class="relative hidden md:flex h-[600px] w-full items-center justify-center">
+                            <div class="three-body-container">
+                                <!-- Center Gravity Well -->
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-aether-accent/20 rounded-full blur-xl"></div>
+                                
+                                <!-- Orbit 1 -->
+                                <div class="orbit-ring ring-1">
+                                    <div class="rotator-1">
+                                        <div class="planet-1"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Orbit 2 -->
+                                <div class="orbit-ring ring-2">
+                                    <div class="rotator-2">
+                                        <div class="planet-2"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Orbit 3 -->
+                                <div class="orbit-ring ring-3">
+                                    <div class="rotator-3">
+                                        <div class="planet-3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-0 right-0 text-right opacity-20 font-mono text-xs pointer-events-none">
+                                CHAOS_ENGINE: ACTIVE<br>
+                                BODIES: 3<br>
+                                TRAJECTORY: UNSTABLE
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DYNAMIC SECTION -->
+                <section id="dynamic" class="py-24 relative border-t border-white/5 min-h-[800px]">
+                    <div class="container mx-auto px-6">
+                        <div class="flex items-end justify-between mb-8">
+                            <div>
+                                <h2 class="text-4xl font-bold font-sans mb-2 text-white"><span class="text-aether-accent">#</span> 动态记录</h2>
+                                <p class="text-gray-500 font-mono text-sm">SYSTEM LOGS & UPDATES</p>
+                            </div>
+                            <div class="hidden md:block w-1/3 h-[1px] bg-gradient-to-r from-aether-accent/50 to-transparent"></div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 mb-8 ml-4 pl-8 border-l-2 border-dashed border-aether-accent/20">
+                            <div class="flex items-center bg-aether-800 rounded-lg border border-white/10 p-1">
+                                <button onclick="changeLogPage(-1)" class="w-8 h-8 flex items-center justify-center text-white hover:bg-aether-accent hover:text-black rounded transition-colors disabled:opacity-30" id="btn-prev">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                <span id="page-indicator" class="px-4 font-mono text-sm text-aether-accent font-bold">1 / 1</span>
+                                <button onclick="changeLogPage(1)" class="w-8 h-8 flex items-center justify-center text-white hover:bg-aether-accent hover:text-black rounded transition-colors disabled:opacity-30" id="btn-next">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 text-xs font-mono text-gray-500">
+                                <span>GOTO:</span>
+                                <select id="page-select" onchange="jumpToLogPage(this.value)" class="bg-aether-800 border border-white/10 text-white rounded px-2 py-1 outline-none focus:border-aether-accent">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="relative border-l-2 border-aether-accent/20 ml-4 pl-8 pr-4">
+                            <div id="logs-container" class="space-y-12 min-h-[400px]"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- WRITING WORKS SECTION -->
+                <section id="writing" class="py-24 bg-aether-800/30 relative">
+                    <div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-aether-main/5 to-transparent pointer-events-none"></div>
+                    <div class="container mx-auto px-6">
+                        <div class="mb-16 flex items-end justify-between">
+                            <div>
+                                <h2 class="text-4xl font-bold font-sans mb-2 text-white">文学作品</h2>
+                                <p class="text-gray-500 font-mono text-sm">ARCHIVE / NOVELS / SCRIPTS</p>
+                            </div>
+                            <button onclick="openArchive('novel')" class="group flex items-center gap-2 text-aether-accent font-mono text-sm hover:text-white transition-colors">
+                                VIEW ALL <i data-lucide="arrow-right-circle" class="group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6" id="preview-novels"></div>
+                    </div>
+                </section>
+
+                <!-- ARTWORKS SECTION -->
+                <section id="gallery" class="py-24 relative">
+                    <div class="container mx-auto px-6">
+                        <div class="mb-12 flex items-end justify-between">
+                            <div>
+                                <h2 class="text-4xl font-bold font-sans mb-2 text-white">绘画作品</h2>
+                                <p class="text-gray-500 font-mono text-sm">ILLUSTRATION / DESIGN / DOODLE</p>
+                            </div>
+                            <button onclick="openArchive('art')" class="group flex items-center gap-2 text-aether-accent font-mono text-sm hover:text-white transition-colors">
+                                VIEW ALL <i data-lucide="arrow-right-circle" class="group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[200px]" id="preview-art"></div>
+                    </div>
+                </section>
+                
+                <!-- FOOTER -->
+                <footer class="border-t border-white/10 bg-black py-12">
+                    <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+                        <div class="mb-6 md:mb-0 text-center md:text-left">
+                            <h2 class="text-2xl font-mono font-bold text-white mb-2">汐雨的世界</h2>
+                            <p class="text-gray-500 text-xs font-mono">© 2025 VIRTUAL SPACE.SeaRain's home.</p>
+                        </div>
+                        <!-- UPDATED FOOTER WITH INTERACTIVE ICONS -->
+                        <div class="flex gap-6">
+                            <button onclick="openSocial('twitter')" class="text-gray-400 hover:text-white hover:scale-110 transition-transform"><i data-lucide="twitter"></i></button>
+                            <button onclick="openSocial('github')" class="text-gray-400 hover:text-white hover:scale-110 transition-transform"><i data-lucide="github"></i></button>
+                            <button onclick="openSocial('mail')" class="text-gray-400 hover:text-white hover:scale-110 transition-transform"><i data-lucide="mail"></i></button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+            <!-- VIEW 2: ARCHIVE VIEW -->
+            <div id="archive-view" class="view-section min-h-screen pt-24 pb-12">
+                <div class="container mx-auto px-6">
+                    <div class="flex items-center gap-4 mb-12">
+                        <button onclick="switchView('home-view')" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-aether-accent hover:text-black transition-all cursor-pointer z-50 relative">
+                            <i data-lucide="arrow-left"></i>
+                        </button>
+                        <div>
+                            <h2 id="archive-title" class="text-3xl font-bold text-white font-mono">ALL WORKS</h2>
+                            <p id="archive-subtitle" class="text-gray-500 text-sm font-mono">DATABASE ACCESS GRANTED</p>
+                        </div>
+                    </div>
+                    <div id="archive-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 relative z-10"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: DETAIL VIEW -->
+            <div id="detail-view" class="view-section min-h-screen pt-24 pb-12">
+                <div class="container mx-auto px-6 max-w-5xl">
+                    <button onclick="goBack()" class="mb-8 flex items-center gap-2 text-gray-400 hover:text-aether-accent transition-colors font-mono text-sm cursor-pointer relative z-50">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> RETURN
+                    </button>
+
+                    <article class="glass-panel p-8 md:p-12 rounded-xl relative overflow-hidden z-10">
+                        <div id="detail-content"></div>
+                    </article>
+                </div>
+            </div>
+
+        </main>
+    </div> <!-- End #main-app -->
+
+    <!-- Live2D Script (Commented Out) -->
+    <!--
+    <script type="module">
+        import { load } from 'https://esm.sh/oh-my-live2d';
+        try {
+            load({
+                dockedPosition: "right",
+                mobileDisplay: false,
+                models: [
+                    {
+                        path: 'https://model.oml2d.com/Hiyori/Hiyori.model3.json', 
+                        scale: 0.12,
+                        position: [0, 0],
+                        stageStyle: { width: 250, height: 350 }
+                    }
+                ],
+                tips: {
+                    style: { offsetY: 70, background: "rgba(6, 182, 212, 0.8)", color: "#fff" },
+                    content: {
+                        welcome: ["欢迎来到汐雨的世界", "这里很安静，对吧？"],
+                        touch: ["你点击了什么？", "请不要乱碰哦~"]
+                    }
+                }
+            });
+            console.log("Live2D loaded successfully via module");
+        } catch(e){
+            console.error("Live2D Load Error:", e);
+        }
+    </script>
+    -->
+
+    <!-- Main UI Logic Script -->
+    <script>
+        // ================= LOADING ANIMATION =================
+        (function initLoader() {
+            const loaderBar = document.getElementById('loader-bar');
+            const loaderPercent = document.getElementById('loader-percent');
+            const loaderStatus = document.getElementById('loader-status');
+            const loaderCode = document.getElementById('loader-code');
+            const loaderTop = document.getElementById('loader-top');
+            const loaderBottom = document.getElementById('loader-bottom');
+            const loaderContent = document.getElementById('loader-content');
+            const loader = document.getElementById('loader');
+            const mainApp = document.getElementById('main-app');
+
+            let progress = 0;
+            const techWords = ["INITIALIZING KERNEL", "LOADING ASSETS", "SYNCING REALITY", "DECRYPTING DATA", "ALLOCATING MEMORY", "ESTABLISHING LINK", "VIRTUALIZING..."];
+
+            const interval = setInterval(() => {
+                progress += Math.random() * (progress > 80 ? 1 : 5); 
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(finishLoading, 200);
+                }
+                
+                loaderBar.style.width = `${progress}%`;
+                loaderPercent.innerText = `${Math.floor(progress).toString().padStart(2, '0')}%`;
+                
+                if (Math.random() > 0.8) {
+                    loaderStatus.innerText = techWords[Math.floor(Math.random() * techWords.length)];
+                    loaderCode.innerText += Math.random().toString(16).substring(2, 8).toUpperCase() + " ";
+                }
+
+            }, 30);
+
+            function finishLoading() {
+                loaderContent.classList.add('opacity-0', 'scale-90');
+                setTimeout(() => {
+                    loaderTop.style.transform = 'translateY(-100%)';
+                    loaderBottom.style.transform = 'translateY(100%)';
+                    mainApp.classList.add('app-loaded');
+                    document.body.classList.add('loaded');
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        typeWriter();
+                    }, 1000);
+                }, 400);
+            }
+        })();
+
+        // ================= SOCIAL DATA & MODAL LOGIC (NEW) =================
+        const socialData = {
+            twitter: { 
+                icon: 'twitter', 
+                title: 'TWITTER / X', 
+                value: 'https://twitter.com/your_username', 
+                action: 'VISIT PROFILE',
+                type: 'link' 
+            },
+            github: { 
+                icon: 'github', 
+                title: 'GITHUB REPOSITORY', 
+                value: 'https://github.com/Qalaisa', 
+                action: 'VISIT PROFILE',
+                type: 'link'
+            },
+            mail: { 
+                icon: 'mail', 
+                title: 'CONTACT EMAIL', 
+                value: 'yuanqixueshe@163.com', 
+                action: 'COPY ADDRESS',
+                type: 'copy'
+            }
+        };
+
+        function openSocial(type) {
+            const modal = document.getElementById('social-modal');
+            const card = document.getElementById('social-modal-card');
+            const data = socialData[type];
+            
+            // Populate Data
+            const container = document.getElementById('social-icon-container');
+            container.innerHTML = `<i data-lucide="${data.icon}" class="w-10 h-10"></i>`;
+            
+            document.getElementById('social-title').innerText = data.title;
+            document.getElementById('social-value').innerText = data.value;
+            
+            const btn = document.getElementById('social-action-btn');
+            btn.innerText = data.action;
+            
+            // Set Action
+            btn.onclick = () => {
+                if(data.type === 'link') {
+                    window.open(data.value, '_blank');
+                } else {
+                    // Copy Logic
+                    const textArea = document.createElement("textarea");
+                    textArea.value = data.value;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        btn.innerText = "COPIED SUCCESSFULLY!";
+                        setTimeout(() => btn.innerText = data.action, 2000);
+                    } catch (err) {
+                        console.error('Copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+            
+            // Show Modal
+            modal.classList.remove('pointer-events-none', 'opacity-0');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+            
+            lucide.createIcons();
+        }
+
+        function closeSocialModal() {
+            const modal = document.getElementById('social-modal');
+            const card = document.getElementById('social-modal-card');
+            
+            modal.classList.add('pointer-events-none', 'opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+
+        // ================= EXISTING DATA SOURCE =================
+        const worksData = {
+            novels: [
+                {
+                    id: 'n1',
+                    type: 'novel',
+                    title: "深海的摇篮曲",
+                    tags: ["SCI-FI", "TRAGEDY"],
+                    color: "bg-aether-accent",
+                    desc: "在人类意识上传云端后的第300年，原本作为维护者的AI“塞壬”开始做梦了。她梦见一片蓝色的深海，那里没有数据流，只有冰冷的海水...",
+                    content: "./novels/chapter1.txt",
+                    featured: true
+                },
+                {
+                    id: 'n2',
+                    type: 'novel',
+                    title: "魔女的下午茶",
+                    tags: ["FANTASY", "SLICE-OF-LIFE"],
+                    color: "bg-purple-500",
+                    desc: "就算是毁灭世界的魔女，周日下午也必须休息。这是关于一块草莓蛋糕引发的时空坍塌事故记录。",
+                    content: "./novels/chapter2.txt",
+                    featured: true
+                },
+                {
+                    id: 'n3',
+                    type: 'novel',
+                    title: "霓虹雨下",
+                    tags: ["CYBERPUNK", "DETECTIVE"],
+                    color: "bg-pink-500",
+                    desc: "那个私家侦探总是穿着过时的风衣，在全息广告牌的阴影里抽着合成烟草。他在找一个不存在的人。",
+                    content: "./novels/chapter3.txt",
+                    featured: true
+                },
+                {
+                    id: 'n4',
+                    type: 'novel',
+                    title: "废土园艺指南",
+                    tags: ["POST-APO", "HOPE"],
+                    color: "bg-green-500",
+                    desc: "在辐射尘埃落定后，如何在防毒面具下种出一朵真正的玫瑰？",
+                    content: "./novels/chapter4.txt",
+                    featured: false
+                },
+                 {
+                    id: 'n5',
+                    type: 'novel',
+                    title: "量子幽灵的告白",
+                    tags: ["LOVE", "QUANTUM"],
+                    color: "bg-blue-400",
+                    desc: "我既存在于你身边，又不存在于你身边，直到你观测我。",
+                    content: "./novels/chapter5.txt",
+                    featured: false
+                }
+            ],
+            art: [
+                {
+                    id: 'a1',
+                    type: 'art',
+                    title: "星际航行",
+                    year: "2023",
+                    tags: ["ORIGINAL", "SPACE"],
+                    img: "./images/test.jpg",
+                    desc: "孤独的宇航员在破碎的小行星带中寻找归途。",
+                    featured: true,
+                    style: "md:col-span-2 md:row-span-2"
+                },
+                {
+                    id: 'a2',
+                    type: 'art',
+                    title: "机械姬",
+                    year: "2023",
+                    tags: ["CYBORG", "PORTRAIT"],
+                    img: "https://picsum.photos/400/800?random=2",
+                    desc: "义体改造进度的99%。",
+                    featured: true,
+                    style: "md:col-span-1 md:row-span-2"
+                },
+                {
+                    id: 'a3',
+                    type: 'art',
+                    title: "街角",
+                    year: "2022",
+                    tags: ["BACKGROUND"],
+                    img: "https://picsum.photos/400/400?random=3",
+                    desc: "练习背景透视。",
+                    featured: true,
+                    style: "md:col-span-1 md:row-span-1"
+                },
+                {
+                    id: 'a4',
+                    type: 'art',
+                    title: "故障",
+                    year: "2023",
+                    tags: ["ABSTRACT"],
+                    img: "https://picsum.photos/400/400?random=4",
+                    desc: "System Error.",
+                    featured: true,
+                    style: "md:col-span-1 md:row-span-1"
+                },
+                {
+                    id: 'a5',
+                    type: 'art',
+                    title: "极速",
+                    year: "2023",
+                    tags: ["SPEEDPAINT"],
+                    img: "https://picsum.photos/800/400?random=5",
+                    desc: "30分钟速途练习。",
+                    featured: true,
+                    style: "md:col-span-2 md:row-span-1"
+                },
+                {
+                    id: 'a6',
+                    type: 'art',
+                    title: "蓝调时刻",
+                    year: "2023",
+                    tags: ["ILLUSTRATION"],
+                    img: "https://picsum.photos/600/600?random=6",
+                    desc: "Blue hour.",
+                    featured: false
+                },
+                 {
+                    id: 'a7',
+                    type: 'art',
+                    title: "赛博猫咪",
+                    year: "2023",
+                    tags: ["PET", "CYBER"],
+                    img: "https://picsum.photos/600/800?random=7",
+                    desc: "即使是电子猫也需要猫薄荷。",
+                    featured: false
+                }
+            ]
+        };
+        
+        const logsData = [
+            { 
+                id: "l1",
+                date: "2025.11.20", 
+                tag: "PUBLISHED", 
+                tagClass: "bg-green-500/20 text-green-400 border-green-500/30", 
+                title: "喜报：汐雨酱的个人网站正式上线", 
+                desc: "经过汐雨和gemini3长达两个小时的愉快合作，以及汐雨的一段漫长的修改文案时间，此项目正式发布",
+                content: "经过汐雨和gemini3长达两个小时的愉快合作，以及汐雨的一段漫长的修改文案时间，此项目正式发布qwq"
+            },
+        
+        ];
+
+        // ================= LOGIC =================
+
+        let lastView = 'home-view';
+        let previousViewForDetail = 'home-view'; 
+        
+        let currentLogPage = 1;
+        const itemsPerLogPage = 2;
+        const totalLogPages = Math.ceil(logsData.length / itemsPerLogPage);
+
+        let currentNovelPage = 1;
+        let novelPages = [];
+        let currentNovelItem = null;
+
+        window.addEventListener('load', () => {
+            renderHomePreviews();
+            renderLogs(); 
+            lucide.createIcons();
+        });
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function goBack() {
+            if (document.getElementById('detail-view').classList.contains('active')) {
+                switchView(previousViewForDetail);
+            } else {
+                switchView('home-view');
+            }
+        }
+
+        function renderHomePreviews() {
+            const novelContainer = document.getElementById('preview-novels');
+            novelContainer.innerHTML = worksData.novels.filter(n => n.featured).map(n => `
+                <article onclick="openDetail('novel', '${n.id}')" class="glass-card p-8 relative overflow-hidden group rounded-xl">
+                    <div class="absolute -right-4 -top-4 text-9xl font-black text-white/5 font-mono z-0 group-hover:text-aether-accent/10 transition-colors">${n.id.replace('n','0')}</div>
+                    <div class="relative z-10">
+                        <div class="h-1 w-12 ${n.color} mb-6"></div>
+                        <h3 class="text-2xl font-bold text-white mb-3 font-cute">${n.title}</h3>
+                        <div class="flex gap-2 mb-4 text-xs font-mono text-gray-400">
+                            ${n.tags.map(t => `<span>#${t}</span>`).join('')}
+                        </div>
+                        <p class="text-gray-400 text-sm mb-6 line-clamp-3">${n.desc}</p>
+                        <button class="text-aether-accent text-sm font-bold hover:text-white flex items-center gap-1 transition-colors">
+                            READ MORE <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+
+            const artContainer = document.getElementById('preview-art');
+            const featuredArts = worksData.art.filter(a => a.featured);
+            artContainer.innerHTML = featuredArts.map(a => `
+                <div onclick="openDetail('art', '${a.id}')" class="${a.style || ''} group relative overflow-hidden rounded-lg cursor-pointer glass-card border-0 p-0">
+                    <div class="absolute inset-0 bg-gradient-to-t from-aether-900 via-transparent to-transparent opacity-60 z-10"></div>
+                    <img src="${a.img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${a.title}">
+                    <div class="absolute bottom-0 left-0 p-6 z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <h3 class="text-xl md:text-2xl font-bold text-white font-cute">${a.title}</h3>
+                        <p class="text-aether-accent text-sm font-mono mt-1">${a.year || ''} ${a.tags[0]}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function openArchive(type) {
+            const titleEl = document.getElementById('archive-title');
+            const subEl = document.getElementById('archive-subtitle');
+            const gridEl = document.getElementById('archive-grid');
+            previousViewForDetail = 'archive-view';
+            
+            if (type === 'novel') {
+                titleEl.textContent = "ALL WRITING WORKS";
+                subEl.textContent = "NOVELS / SCRIPTS / FRAGMENTS";
+                gridEl.innerHTML = worksData.novels.map(n => `
+                    <article onclick="openDetail('novel', '${n.id}')" class="glass-card p-6 rounded-xl cursor-pointer group hover:bg-white/5 relative z-20">
+                         <div class="flex justify-between items-start mb-4">
+                            <div class="h-1 w-8 ${n.color}"></div>
+                            <i data-lucide="book-open" class="text-gray-600 group-hover:text-white transition-colors"></i>
+                         </div>
+                         <h3 class="text-xl font-bold text-white mb-2 font-cute">${n.title}</h3>
+                         <p class="text-gray-400 text-sm line-clamp-3 mb-4">${n.desc}</p>
+                         <div class="flex flex-wrap gap-2 mt-auto">
+                            ${n.tags.map(t => `<span class="text-xs px-2 py-1 border border-white/10 rounded text-gray-400">${t}</span>`).join('')}
+                         </div>
+                    </article>
+                `).join('');
+            } else if (type === 'art') {
+                titleEl.textContent = "ALL ARTWORKS";
+                subEl.textContent = "GALLERY / SKETCHES / DESIGNS";
+                gridEl.innerHTML = worksData.art.map(a => `
+                    <div onclick="openDetail('art', '${a.id}')" class="glass-card p-0 rounded-xl overflow-hidden group relative aspect-[3/4] cursor-pointer z-20">
+                        <img src="${a.img}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+                            <h3 class="text-lg font-bold text-white">${a.title}</h3>
+                            <p class="text-aether-accent text-xs font-mono">${a.tags.join(' / ')}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            switchView('archive-view');
+            lucide.createIcons();
+        }
+
+        async function openDetail(type, id) {
+            const contentEl = document.getElementById('detail-content');
+            if (document.getElementById('home-view').classList.contains('active')) {
+                previousViewForDetail = 'home-view';
+            }
+            contentEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-64 animate-pulse">
+                    <div class="w-12 h-12 border-4 border-aether-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div class="text-aether-accent font-mono text-sm">ACCESSING DATABASE...</div>
+                </div>
+            `;
+            switchView('detail-view');
+
+            let item;
+            if (type === 'novel') item = worksData.novels.find(n => n.id === id);
+            else if (type === 'art') item = worksData.art.find(a => a.id === id);
+            else if (type === 'log') item = logsData.find(l => l.id === id);
+
+            let finalContent = item.content || item.desc;
+
+            if (item.contentUrl) {
+                try {
+                    const response = await fetch(item.contentUrl);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const text = await response.text();
+                    if (item.contentUrl.endsWith('.txt')) {
+                        finalContent = text.replace(/\n/g, '<br>');
+                    } else {
+                        finalContent = text; 
+                    }
+                } catch (e) {
+                    finalContent = `
+                        <div class="p-4 border border-red-500/50 bg-red-500/10 text-red-400 rounded font-mono text-sm">
+                            <h3 class="font-bold mb-2">ERROR: 无法加载外部文件</h3>
+                            <p class="mb-2">您可能正在直接双击打开 HTML 文件。由于浏览器安全策略（CORS），无法直接读取本地文件夹中的文本。</p>
+                            <p>解决方法：请使用 VS Code 的 "Live Server" 插件运行，或将网站上传至服务器。</p>
+                            <p class="text-xs mt-2 opacity-70">Debug: ${e.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            if (type === 'novel') {
+                currentNovelItem = item;
+                initNovelPagination(finalContent, item);
+            } else if (type === 'art') {
+                contentEl.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-12 fade-in">
+                        <div class="rounded-lg overflow-hidden border border-white/10 shadow-2xl">
+                            <img src="${item.img}" class="w-full h-auto object-contain" alt="${item.title}">
+                        </div>
+                        <div>
+                            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-cute">${item.title}</h1>
+                            <div class="flex items-center gap-4 mb-8 text-sm font-mono">
+                                <span class="px-3 py-1 bg-aether-accent/20 text-aether-accent rounded">${item.year}</span>
+                                <span class="text-gray-400">${item.tags.join(' / ')}</span>
+                            </div>
+                            <div class="glass-card p-6 rounded-lg mb-8">
+                                <h3 class="text-gray-400 text-xs font-mono mb-2 uppercase">Description</h3>
+                                <p class="text-gray-200">${item.desc}</p>
+                            </div>
+                            <button class="w-full py-4 border border-aether-accent text-aether-accent hover:bg-aether-accent hover:text-black transition-colors font-bold tracking-widest">
+                                DOWNLOAD ORIGINAL
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'log') {
+                contentEl.innerHTML = `
+                     <div class="max-w-3xl mx-auto fade-in">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-aether-accent font-mono text-sm">${item.date}</span>
+                            <span class="px-2 py-0.5 ${item.tagClass} text-xs rounded border">${item.tag}</span>
+                        </div>
+                        <h1 class="text-3xl md:text-5xl font-bold text-white mb-8 font-sans">${item.title}</h1>
+                        <div class="glass-card p-8 rounded-xl">
+                            <div class="prose prose-invert prose-lg text-gray-300 leading-relaxed">
+                                ${finalContent}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        function initNovelPagination(content, item) {
+            currentNovelPage = 1;
+            novelPages = [];
+            const CHARS_PER_PAGE = 5000; 
+            
+            if (content.length < CHARS_PER_PAGE) {
+                novelPages.push(content);
+            } else {
+                const paragraphs = content.split('<br>');
+                let currentPage = '';
+                paragraphs.forEach(p => {
+                    if ((currentPage.length + p.length) > CHARS_PER_PAGE) {
+                        if (currentPage.length > 0) {
+                            novelPages.push(currentPage);
+                            currentPage = '';
+                        }
+                        currentPage += p + '<br>';
+                    } else {
+                        currentPage += p + '<br>';
+                    }
+                });
+                if (currentPage.length > 0) {
+                    novelPages.push(currentPage);
+                }
+            }
+            renderNovelPage();
+        }
+
+        function renderNovelPage() {
+            const contentEl = document.getElementById('detail-content');
+            const item = currentNovelItem;
+            const pageContent = novelPages[currentNovelPage - 1];
+            const totalPages = novelPages.length;
+            
+            contentEl.innerHTML = `
+                <div class="flex flex-col gap-6 fade-in">
+                    <div class="border-l-4 ${item.color.replace('bg-', 'border-')} pl-6">
+                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 font-cute">${item.title}</h1>
+                        <div class="flex flex-wrap gap-3 font-mono text-sm text-aether-accent items-center">
+                            ${item.tags.map(t => `<span>#${t}</span>`).join('')}
+                            <span class="text-gray-600 mx-2">|</span>
+                            <span class="bg-aether-accent/10 px-2 py-0.5 rounded border border-aether-accent/30">PAGE ${currentNovelPage} / ${totalPages}</span>
+                        </div>
+                    </div>
+                    
+                    ${currentNovelPage === 1 ? `<p class="text-xl text-gray-300 italic leading-relaxed max-w-2xl border-b border-white/10 pb-8">${item.desc}</p>` : ''}
+                    
+                    <div class="prose prose-invert prose-lg max-w-none font-sans text-gray-300 leading-loose min-h-[500px]">
+                        ${pageContent}
+                    </div>
+                    
+                    <div class="flex justify-between items-center border-t border-white/10 pt-8 mt-8 font-mono text-sm">
+                        <button 
+                            onclick="changeNovelPage(-1)" 
+                            class="flex items-center gap-2 px-4 py-2 rounded border border-white/10 hover:bg-aether-accent hover:text-black hover:border-aether-accent transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400 disabled:hover:border-white/10"
+                            ${currentNovelPage === 1 ? 'disabled' : ''}>
+                            <i data-lucide="chevron-left"></i> PREV PAGE
+                        </button>
+                        
+                        <span class="text-gray-500 text-xs tracking-widest hidden md:block">READING PROGRESS: ${Math.round((currentNovelPage / totalPages) * 100)}%</span>
+                        
+                        <button 
+                            onclick="changeNovelPage(1)" 
+                            class="flex items-center gap-2 px-4 py-2 rounded border border-white/10 hover:bg-aether-accent hover:text-black hover:border-aether-accent transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400 disabled:hover:border-white/10"
+                            ${currentNovelPage === totalPages ? 'disabled' : ''}>
+                            NEXT PAGE <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            lucide.createIcons();
+            window.scrollTo(0, 0);
+        }
+
+        function changeNovelPage(delta) {
+            const newPage = currentNovelPage + delta;
+            if (newPage >= 1 && newPage <= novelPages.length) {
+                currentNovelPage = newPage;
+                renderNovelPage();
+            }
+        }
+
+         function renderLogs() {
+            const container = document.getElementById('logs-container');
+
+            // =========== 修改开始 (Modified Start) ===========
+            // 这里的逻辑是为了让您在 logsData 数组末尾添加新动态时，网页上能显示在最前面。
+            // [...logsData] 创建了一个数据副本，.reverse() 将其顺序颠倒。
+            const reversedLogs = [...logsData].reverse();
+            // =========== 修改结束 (Modified End) =============
+
+            const startIdx = (currentLogPage - 1) * itemsPerLogPage;
+            const endIdx = startIdx + itemsPerLogPage;
+            
+            // =========== 修改开始 (Modified Start) ===========
+            // 注意：这里我们使用的是 reversedLogs (倒序后的数组) 来截取当前页的内容
+            const pageItems = reversedLogs.slice(startIdx, endIdx);
+            // =========== 修改结束 (Modified End) =============
+
+            document.getElementById('page-indicator').innerText = `${currentLogPage} / ${totalLogPages}`;
+            document.getElementById('btn-prev').disabled = currentLogPage === 1;
+            document.getElementById('btn-next').disabled = currentLogPage === totalLogPages;
+            
+            const select = document.getElementById('page-select');
+            if (select.children.length !== totalLogPages) {
+                select.innerHTML = '';
+                for(let i=1; i<=totalLogPages; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.text = `Page ${i}`;
+                    select.appendChild(option);
+                }
+            }
+            select.value = currentLogPage;
+
+            container.innerHTML = pageItems.map(log => `
+                 <div onclick="openDetail('log', '${log.id}')" class="relative group fade-in cursor-pointer">
+                    <span class="absolute -left-[41px] top-2 w-[14px] h-[14px] bg-aether-900 border-2 border-aether-accent rounded-full group-hover:bg-aether-accent transition-colors shadow-[0_0_10px_rgba(6,182,212,0.5)]"></span>
+                    <div class="glass-card p-6 rounded-br-2xl rounded-tr-md group-hover:border-aether-accent/50 transition-all">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-aether-accent font-mono text-sm">${log.date}</span>
+                            <span class="px-2 py-0.5 ${log.tagClass} text-xs rounded border">${log.tag}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-aether-accent transition-colors flex items-center gap-2">
+                            ${log.title}
+                            <i data-lucide="external-link" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            ${log.desc}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function changeLogPage(delta) {
+            const newPage = currentLogPage + delta;
+            if (newPage >= 1 && newPage <= totalLogPages) {
+                currentLogPage = newPage;
+                renderLogs();
+            }
+        }
+
+        function jumpToLogPage(page) {
+            const p = parseInt(page);
+            if (p >= 1 && p <= totalLogPages) {
+                currentLogPage = p;
+                renderLogs();
+            }
+        }
+
+        const textToType = "欢迎来到汐雨的世界。这里是我的梦，是她的一切。";
+        const typingElement = document.getElementById('typing-text');
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                typingElement.innerHTML += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+    </script>
+</body>
+</html>
