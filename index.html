@@ -748,51 +748,51 @@
                 {
                     id: 'n1',
                     type: 'novel',
-                    title: "深海的摇篮曲",
-                    tags: ["SCI-FI", "TRAGEDY"],
+                    title: "那年战火逢花开",
+                    tags: ["FANTASY", "TRAGEDY"],
                     color: "bg-aether-accent",
-                    desc: "在人类意识上传云端后的第300年，原本作为维护者的AI“塞壬”开始做梦了。她梦见一片蓝色的深海，那里没有数据流，只有冰冷的海水...",
+                    desc: "庭有枇杷树，吾妻死之年所手植也，今已亭亭如盖矣。",
                     contentUrl: "./novels/chapter1.txt",
                     featured: true
                 },
                 {
                     id: 'n2',
                     type: 'novel',
-                    title: "魔女的下午茶",
-                    tags: ["FANTASY", "SLICE-OF-LIFE"],
+                    title: "转生成为孙文扬之我出生就会四大力学",
+                    tags: ["CPhO", "NET-LITERATURE"],
                     color: "bg-purple-500",
-                    desc: "就算是毁灭世界的魔女，周日下午也必须休息。这是关于一块草莓蛋糕引发的时空坍塌事故记录。",
-                    content: "./novels/chapter2.txt",
+                    desc: "劲牌孙文扬的封神之路。",
+                    contentUrl: "./novels/chapter2.txt",
                     featured: true
                 },
                 {
                     id: 'n3',
                     type: 'novel',
-                    title: "霓虹雨下",
-                    tags: ["CYBERPUNK", "DETECTIVE"],
+                    title: "海淀残阳",
+                    tags: ["WAR", "SURREALISTIC"],
                     color: "bg-pink-500",
-                    desc: "那个私家侦探总是穿着过时的风衣，在全息广告牌的阴影里抽着合成烟草。他在找一个不存在的人。",
-                    content: "./novels/chapter3.txt",
+                    desc: "西山苍苍，东海茫茫，吾校何往？燕园春已尽，此地非故乡。",
+                    contentUrl: "./novels/chapter3.txt",
                     featured: true
                 },
                 {
                     id: 'n4',
                     type: 'novel',
-                    title: "废土园艺指南",
-                    tags: ["POST-APO", "HOPE"],
+                    title: "群星往事",
+                    tags: ["SCI-FI", "STELLARIS"],
                     color: "bg-green-500",
-                    desc: "在辐射尘埃落定后，如何在防毒面具下种出一朵真正的玫瑰？",
-                    content: "./novels/chapter4.txt",
+                    desc: "关于你在玩群星的时候随手点了一下战列舰科技的时候群星世界里面到底发生了什么的这件事。",
+                    contentUrl: "./novels/chapter4.txt",
                     featured: false
                 },
                  {
                     id: 'n5',
                     type: 'novel',
-                    title: "量子幽灵的告白",
-                    tags: ["LOVE", "QUANTUM"],
+                    title: "红星照耀世界",
+                    tags: ["SCI-FI", "CCCP"],
                     color: "bg-blue-400",
-                    desc: "我既存在于你身边，又不存在于你身边，直到你观测我。",
-                    content: "./novels/chapter5.txt",
+                    desc: "1989年11月9日，他的相机，记录下了历史的终结。但终结的，并不是他所以为的那一方。",
+                    contentUrl: "./novels/chapter5.txt",
                     featured: false
                 }
             ],
@@ -800,11 +800,11 @@
                 {
                     id: 'a1',
                     type: 'art',
-                    title: "星际航行",
+                    title: "流泪猫猫头",
                     year: "2023",
                     tags: ["ORIGINAL", "SPACE"],
                     img: "./images/test.jpg",
-                    desc: "孤独的宇航员在破碎的小行星带中寻找归途。",
+                    desc: "随便画的表情包QAQ",
                     featured: true,
                     style: "md:col-span-2 md:row-span-2"
                 },
@@ -885,7 +885,15 @@
                 desc: "经过汐雨和gemini3长达两个小时的愉快合作，以及汐雨的一段漫长的修改文案时间，此项目正式发布",
                 content: "经过汐雨和gemini3长达两个小时的愉快合作，以及汐雨的一段漫长的修改文案时间，此项目正式发布qwq"
             },
-        
+            { 
+                id: "l2",
+                date: "2025.11.21", 
+                tag: "UPDATE", 
+                tagClass: "bg-blue-500/20 text-blue-400 border-blue-500/30", 
+                title: "喜报2.0：第一次更新一下网站", 
+                desc: "似乎没什么问题了这次，把小说先传一下上来，后续还会上传更多的东西",
+                content: "似乎没什么问题了这次，把小说先传一下上来，后续还会上传更多的东西qwq"
+            },
         ];
 
         // ================= LOGIC =================
@@ -1133,11 +1141,16 @@
                     
                     ${currentNovelPage === 1 ? `<p class="text-xl text-gray-300 italic leading-relaxed max-w-2xl border-b border-white/10 pb-8">${item.desc}</p>` : ''}
                     
-                    <div class="prose prose-invert prose-lg max-w-none font-sans text-gray-300 leading-loose min-h-[500px]">
+                    <!-- 修改说明：
+                         text-lg : 字号设置为 18px (比默认大，比之前的 20px 小)
+                         leading-8 : 行高设置为 32px (提供舒适的阅读间隙)
+                         tracking-wide : 稍微增加一点字间距，防止汉字挤在一起
+                    -->
+                    <div class="prose prose-invert max-w-none font-sans text-gray-300 text-lg leading-8 tracking-wide min-h-[500px]">
                         ${pageContent}
                     </div>
                     
-                    <div class="flex justify-between items-center border-t border-white/10 pt-8 mt-8 font-mono text-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-8 mt-8 font-mono text-sm gap-4">
                         <button 
                             onclick="changeNovelPage(-1)" 
                             class="flex items-center gap-2 px-4 py-2 rounded border border-white/10 hover:bg-aether-accent hover:text-black hover:border-aether-accent transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400 disabled:hover:border-white/10"
@@ -1145,7 +1158,13 @@
                             <i data-lucide="chevron-left"></i> PREV PAGE
                         </button>
                         
-                        <span class="text-gray-500 text-xs tracking-widest hidden md:block">READING PROGRESS: ${Math.round((currentNovelPage / totalPages) * 100)}%</span>
+                        <div class="flex items-center gap-3 bg-aether-900/50 px-4 py-2 rounded-full border border-white/5">
+                            <span class="text-gray-500 text-xs hidden md:inline">PAGE</span>
+                            <input type="number" id="novel-page-input" value="${currentNovelPage}" min="1" max="${totalPages}" 
+                                class="bg-transparent border-b border-aether-accent/30 text-aether-accent text-center w-12 outline-none focus:border-aether-accent transition-colors"
+                                onchange="jumpToNovelPage(this.value)">
+                            <span class="text-gray-500 text-xs">/ ${totalPages}</span>
+                        </div>
                         
                         <button 
                             onclick="changeNovelPage(1)" 
@@ -1166,6 +1185,17 @@
             if (newPage >= 1 && newPage <= novelPages.length) {
                 currentNovelPage = newPage;
                 renderNovelPage();
+            }
+        }
+
+        function jumpToNovelPage(page) {
+            const p = parseInt(page);
+            if (p >= 1 && p <= novelPages.length) {
+                currentNovelPage = p;
+                renderNovelPage();
+            } else {
+                // Reset input value if invalid
+                document.getElementById('novel-page-input').value = currentNovelPage;
             }
         }
 
@@ -1240,7 +1270,7 @@
             }
         }
 
-        const textToType = "欢迎来到汐雨的世界。这里是我的梦，是她的一切。";
+        const textToType = "欢迎来到汐雨的世界。这里是她的梦，也是她的一切。";
         const typingElement = document.getElementById('typing-text');
         let charIndex = 0;
         function typeWriter() {
