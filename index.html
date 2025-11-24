@@ -794,6 +794,56 @@
                     desc: "1989年11月9日，他的相机，记录下了历史的终结。但终结的，并不是他所以为的那一方。",
                     contentUrl: "./novels/chapter5.txt",
                     featured: false
+                },
+                {
+                    id: 'n6',
+                    type: 'novel',
+                    title: "汐雨行记",
+                    tags: ["CALLBACK", "MEMORY"],
+                    color: "bg-cyan-400",
+                    desc: "冷漠的造世主行于世间。",
+                    contentUrl: "./novels/chapter6.txt",
+                    featured: false
+                },
+                {
+                    id: 'n7',
+                    type: 'novel',
+                    title: "新巴比伦略有失重感",
+                    tags: ["SCI-FI", "WAR"],
+                    color: "bg-orange-400",
+                    desc: "新巴比伦每日资讯：今日天气晴朗，气温适宜。受外围能量波动影响，新巴比伦略有失重感。祝您有愉快的一天。",
+                    contentUrl: "./novels/chapter7.txt",
+                    featured: false
+                },
+                {
+                    id: 'n8',
+                    type: 'novel',
+                    title: "金牌，猫与时空涟漪",
+                    tags: ["PHILOSOPHY", "ESSAY"],
+                    color: "bg-sky-300",
+                    desc: "对猫来说，这只是一次普通的、吹着风的愉快旅程。 对少女来说，这也是。",
+                    contentUrl: "./novels/chapter8.txt",
+                    featured: false
+                },
+                {
+                    id: 'n9',
+                    type: 'novel',
+                    title: "天元之弈",
+                    tags: ["SCI-FI", "OUTWIT"],
+                    color: "bg-lime-400",
+                    desc: "不战而屈人之兵，善之善者也。故上兵伐谋，其次伐交，其次伐兵，其下攻城。攻城之法，为不得已。——《孙子兵法·谋攻篇》",
+                    contentUrl: "./novels/chapter9.txt",
+                    featured: false
+                },
+                {
+                    id: 'n10',
+                    type: 'novel',
+                    title: "《深渊回响》官方论坛bug反馈区",
+                    tags: ["THE-NEW—WEIRD"],
+                    color: "bg-rose-500",
+                    desc: "主题：【提问】关于一个随机刷新，无法交互的NPC“无名者”",
+                    contentUrl: "./novels/chapter10.txt",
+                    featured: false
                 }
             ],
             art: [
@@ -801,7 +851,7 @@
                     id: 'a1',
                     type: 'art',
                     title: "流泪猫猫头",
-                    year: "2023",
+                    year: "2025",
                     tags: ["ORIGINAL", "SPACE"],
                     img: "./images/test.jpg",
                     desc: "随便画的表情包QAQ",
@@ -810,68 +860,37 @@
                 },
                 {
                     id: 'a2',
-                    type: 'art',
-                    title: "机械姬",
-                    year: "2023",
-                    tags: ["CYBORG", "PORTRAIT"],
-                    img: "https://picsum.photos/400/800?random=2",
-                    desc: "义体改造进度的99%。",
+                    type: 'meme',
+                    title: "数学分析",
+                    year: "2025",
+                    tags: ["MATH"],
+                    img: "./images/数分.jpg",
+                    desc: "真实心态",
+                    featured: true,
+                    style: "md:col-span-1 md:row-span-1"
+                },
+                {
+                    id: 'a3',
+                    type: 'meme',
+                    title: "核战争对小猫有害",
+                    year: "2025",
+                    tags: ["CAT"],
+                    img: "./images/核战争对小猫有害.jpg",
+                    desc: "核战争对小猫有害",
                     featured: true,
                     style: "md:col-span-1 md:row-span-2"
                 },
                 {
-                    id: 'a3',
-                    type: 'art',
-                    title: "街角",
-                    year: "2022",
-                    tags: ["BACKGROUND"],
-                    img: "https://picsum.photos/400/400?random=3",
-                    desc: "练习背景透视。",
-                    featured: true,
-                    style: "md:col-span-1 md:row-span-1"
-                },
-                {
                     id: 'a4',
-                    type: 'art',
-                    title: "故障",
-                    year: "2023",
+                    type: 'meme',
+                    title: "我是弱秩",
+                    year: "2025",
                     tags: ["ABSTRACT"],
-                    img: "https://picsum.photos/400/400?random=4",
-                    desc: "System Error.",
+                    img: "./images/弱秩.jpg",
+                    desc: "弱秩",
                     featured: true,
                     style: "md:col-span-1 md:row-span-1"
                 },
-                {
-                    id: 'a5',
-                    type: 'art',
-                    title: "极速",
-                    year: "2023",
-                    tags: ["SPEEDPAINT"],
-                    img: "https://picsum.photos/800/400?random=5",
-                    desc: "30分钟速途练习。",
-                    featured: true,
-                    style: "md:col-span-2 md:row-span-1"
-                },
-                {
-                    id: 'a6',
-                    type: 'art',
-                    title: "蓝调时刻",
-                    year: "2023",
-                    tags: ["ILLUSTRATION"],
-                    img: "https://picsum.photos/600/600?random=6",
-                    desc: "Blue hour.",
-                    featured: false
-                },
-                 {
-                    id: 'a7',
-                    type: 'art',
-                    title: "赛博猫咪",
-                    year: "2023",
-                    tags: ["PET", "CYBER"],
-                    img: "https://picsum.photos/600/800?random=7",
-                    desc: "即使是电子猫也需要猫薄荷。",
-                    featured: false
-                }
             ]
         };
         
@@ -893,6 +912,15 @@
                 title: "喜报2.0：第一次更新一下网站", 
                 desc: "似乎没什么问题了这次，把小说先传一下上来，后续还会上传更多的东西",
                 content: "似乎没什么问题了这次，把小说先传一下上来，后续还会上传更多的东西qwq"
+            },
+            { 
+                id: "l3",
+                date: "2025.11.24", 
+                tag: "UPDATE", 
+                tagClass: "bg-purple-500/20 text-purple-400 border-purple-500/30", 
+                title: "锐评线性代数", 
+                desc: "自从开始学什么秩，线性空间，四个子空间之后就开始抽象的要死，写个作业难受的要死",
+                content: "自从开始学什么秩，线性空间，四个子空间之后就开始抽象的要死，写个作业难受的要死"
             },
         ];
 
